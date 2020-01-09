@@ -4,7 +4,7 @@ provider "ignition" {
 
 locals {
   mask = "${element(split("/", var.machine_cidr), 1)}"
-  gw   = "${cidrhost(var.machine_cidr,1)}"
+  gw   = "10.19.115.254"
 
   ignition_encoded = "data:text/plain;charset=utf-8;base64,${base64encode(var.ignition)}"
 }
@@ -39,38 +39,18 @@ IPADDR=${local.ip_addresses[count.index]}
 PREFIX=${local.mask}
 GATEWAY=${local.gw}
 DOMAIN=${var.cluster_domain}
-DNS1=1.1.1.1
-DNS2=9.9.9.9
+DNS1=10.19.143.247
+DNS2=10.19.143.248
 EOF
   }
-}
-
-data "ignition_systemd_unit" "restart" {
-  count = "${var.instance_count}"
-
-  name = "restart.service"
-
-  content = <<EOF
-[Unit]
-ConditionFirstBoot=yes
-[Service]
-Type=idle
-ExecStart=/sbin/reboot
-[Install]
-WantedBy=multi-user.target
-EOF
 }
 
 data "ignition_config" "ign" {
   count = "${var.instance_count}"
 
   append {
-    source = "${var.ignition_url != "" ? var.ignition_url : local.ignition_encoded}"
+    source = "${local.ignition_encoded}"
   }
-
-  systemd = [
-    "${data.ignition_systemd_unit.restart.*.id[count.index]}",
-  ]
 
   files = [
     "${data.ignition_file.hostname.*.id[count.index]}",
