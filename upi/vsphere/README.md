@@ -1,59 +1,24 @@
-# Pre-Requisites
+# OpenShift Clients
 
-* terraform
-* jq
+The OpenShift client `oc` simplifies working with Kubernetes and OpenShift
+clusters, offering a number of advantages over `kubectl` such as easy login,
+kube config file management, and access to developer tools. The `kubectl`
+binary is included alongside for when strict Kubernetes compliance is necessary.
 
-# Build a Cluster
+To learn more about OpenShift, visit [docs.openshift.com](https://docs.openshift.com)
+and select the version of OpenShift you are using.
 
-1. Create an install-config.yaml.
-The machine CIDR for the dev cluster is 139.178.89.192/26.
+## Installing the tools
 
-```
-apiVersion: v1
-baseDomain: devcluster.openshift.com
-metadata:
-  name: mstaeble
-networking:
-  machineCIDR: "139.178.89.192/26"
-platform:
-  vsphere:
-    vCenter: vcsa.vmware.devcluster.openshift.com
-    username: YOUR_VSPHERE_USER
-    password: YOUR_VSPHERE_PASSWORD
-    datacenter: dc1
-    defaultDatastore: nvme-ds1
-pullSecret: YOUR_PULL_SECRET
-sshKey: YOUR_SSH_KEY
-```
+After extracting this archive, move the `oc` and `kubectl` binaries
+to a location on your PATH such as `/usr/local/bin`. Then run:
 
-2. Run `openshift-install create ignition-configs`.
+    oc login [API_URL]
 
-3. Fill out a terraform.tfvars file with the ignition configs generated.
-There is an example terraform.tfvars file in this directory named terraform.tfvars.example. The example file is set up for use with the dev cluster running at vcsa.vmware.devcluster.openshift.com. At a minimum, you need to set values for the following variables.
-* cluster_id
-* cluster_domain
-* vsphere_user
-* vsphere_password
-* ipam_token
-* bootstrap_ignition_url
-* control_plane_ignition
-* compute_ignition
-The bootstrap ignition config must be placed in a location that will be accessible by the bootstrap machine. For example, you could store the bootstrap ignition config in a gist.
+to start a session against an OpenShift cluster. After login, run `oc` and
+`oc help` to learn more about how to get started with OpenShift.
 
-4. Run `terraform init`.
+## License
 
-5. Ensure that you have you AWS profile set and a region specified. The installation will use create AWS route53 resources for routing to the OpenShift cluster.
-
-6. Run `terraform apply -auto-approve`.
-This will reserve IP addresses for the VMs.
-
-7. Run `openshift-install wait-for bootstrap-complete`. Wait for the bootstrapping to complete.
-
-8. Run `terraform apply -auto-approve -var 'bootstrap_complete=true'`.
-This will destroy the bootstrap VM.
-
-9. Run `openshift-install wait-for install-complete`. Wait for the cluster install to finish.
-
-10. Enjoy your new OpenShift cluster.
-
-11. Run `terraform destroy -auto-approve`.
+OpenShift is licensed under the Apache Public License 2.0. The source code for this
+program is [located on github](https://github.com/openshift/origin).

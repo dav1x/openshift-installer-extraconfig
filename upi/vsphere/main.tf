@@ -29,7 +29,7 @@ module "bootstrap" {
 
   name             = "bootstrap"
   instance_count   = "${var.bootstrap_complete ? 0 : 1}"
-  ignition         = "${file("${var.bootstrap_ignition_path}")}"
+  ignition         = "${file("${path.module}/ignition/bootstrap.ign")}" 
   resource_pool_id = "${module.resource_pool.pool_id}"
   datastore        = "${var.vsphere_datastore}"
   folder           = "${module.folder.path}"
@@ -50,7 +50,7 @@ module "control_plane" {
 
   name             = "control-plane"
   instance_count   = "${var.control_plane_count}"
-  ignition         = "${file("${var.control_plane_ignition_path}")}"
+  ignition         = "${file("${path.module}/ignition/master.ign")}" 
   resource_pool_id = "${module.resource_pool.pool_id}"
   folder           = "${module.folder.path}"
   datastore        = "${var.vsphere_datastore}"
@@ -71,7 +71,7 @@ module "compute" {
 
   name             = "compute"
   instance_count   = "${var.compute_count}"
-  ignition         = "${file("${var.compute_ignition_path}")}"
+  ignition         = "${file("${path.module}/ignition/worker.ign")}" 
   resource_pool_id = "${module.resource_pool.pool_id}"
   folder           = "${module.folder.path}"
   datastore        = "${var.vsphere_datastore}"
@@ -83,10 +83,10 @@ module "compute" {
   ipam_token       = "${var.ipam_token}"
   ip_addresses     = ["${var.compute_ips}"]
   machine_cidr     = "${var.machine_cidr}"
-  memory           = "8192"
+  memory           = "16384"
   num_cpu          = "4"
 }
-
+/*
 module "dns" {
   source = "./route53"
 
@@ -99,3 +99,4 @@ module "dns" {
   compute_count       = "${var.compute_count}"
   compute_ips         = ["${module.compute.ip_addresses}"]
 }
+*/
